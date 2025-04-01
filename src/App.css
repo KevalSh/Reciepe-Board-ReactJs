@@ -40,3 +40,11 @@
 .read-the-docs {
   color: #888;
 }
+
+.creditorStyle {
+  color: green;
+}
+
+.debitorStyle {
+  color: red;
+}
