@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./App.css";
+import "./index.css";
 
 /**
  * 10000 intial balanace  --done
@@ -12,11 +12,23 @@ import "./App.css";
 export default function App() {
   const [balance, setBalance] = useState(10000);
   const [inputValue, setInputValue] = useState();
+  // {type : 'Credit' | 'Debit' , amount : inputValue}
   const [expenseList, setExpenseList] = useState([]);
 
   const creditEntry = () => {
-    const creditExpenseList = [...expenseList, inputValue];
-    const creditor = balance + Number(inputValue);
+    const creditExpenseList = [...expenseList];
+
+    const transactions = {
+      id: Math.random(),
+      type: "Credit",
+      amount: inputValue,
+    };
+
+    creditExpenseList.push(transactions);
+
+    const creditor = Number(balance) + Number(inputValue);
+
+    //console.log(creditExpenseList, creditor);
 
     setBalance(creditor);
     setInputValue("");
@@ -24,7 +36,16 @@ export default function App() {
   };
 
   const debitEntry = () => {
-    const debitExpenseList = [...expenseList, inputValue];
+    const debitExpenseList = [...expenseList];
+    // structure of the transaction object
+    const transactions = {
+      id: Math.random(),
+      type: "Dedit",
+      amount: inputValue,
+    };
+
+    debitExpenseList.push(transactions);
+
     const debitor = balance - Number(inputValue);
 
     setBalance(debitor);
@@ -32,7 +53,17 @@ export default function App() {
     setExpenseList(debitExpenseList);
   };
 
-  const removeExpense = (index) => {
+  const removeExpense = (index, amount) => {
+    // order of parameter should be maintained as they were passed near the function
+    //correcting the balance after removing the item
+    let updateBalance = balance;
+    if (amount.type === "Credit") {
+      updateBalance = Number(updateBalance) - Number(amount.amount);
+    } else {
+      updateBalance = Number(updateBalance) + Number(amount.amount);
+    }
+    setBalance(updateBalance);
+    // removing the expense
     const updatedExpenseList = expenseList.filter((_, i) => i !== index);
     setExpenseList(updatedExpenseList);
   };
@@ -47,11 +78,13 @@ export default function App() {
         onChange={(e) => setInputValue(e.target.value)}
       />
       <button onClick={creditEntry}>Credit Entry</button>
-      <button onClick={debitEntry}>Debit Entry</button>
+      <button className="bg-red-50" onClick={debitEntry}>
+        Debit Entry
+      </button>
       <ul>
         {expenseList.map((amount, index) => (
           <div key={index}>
-            {amount}
+            {amount.type} -- {amount.amount}
             <button onClick={() => removeExpense(index, amount)}>Remove</button>
           </div>
         ))}
